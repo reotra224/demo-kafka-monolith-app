@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  monolith-db:
+    image: mysql:8
+    restart: always
+    volumes:
+      - ~/dev-workspace/demos/volumes/monolith-db/:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=monolith_db
+      - MYSQL_ROOT_PASSWORD=monolith_db_pass
+      - MYSQL_USER=monolith_user
+      - MYSQL_PASSWORD=monolith_pass
+    ports:
+      - '3306:3306'
