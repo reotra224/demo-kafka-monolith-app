@@ -19,7 +19,7 @@ import java.util.UUID;
 @Entity(name = "produits")
 @Getter
 @Setter
-@ToString(exclude = "commandes")
+@ToString()
 @NoArgsConstructor
 @AllArgsConstructor
 public class Produit {
@@ -36,7 +36,4 @@ public class Produit {
 
     @Column(nullable = false)
     private LocalDateTime dateCreation;
-
-    @ManyToMany(mappedBy = "produits")
-    private List<Commande> commandes;
 }
