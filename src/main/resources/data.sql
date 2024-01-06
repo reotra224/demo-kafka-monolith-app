@@ -21,4 +21,5 @@ insert into stocks_produits (stock_actuel, date_creation, id, produit_id) values
 
 
 ### COUNTER
-insert into counter (current_value, type, date_changement) VALUES (0, 'COMMANDE', {ts '2023-12-31 20:30:45.0'})
+insert into counter (current_value, type, date_changement) VALUES (0, 'COMMANDE', {ts '2023-12-31 20:30:45.0'});
+insert into counter (current_value, type, date_changement) VALUES (0, 'LIVRAISON', {ts '2024-01-06 20:30:45.0'});

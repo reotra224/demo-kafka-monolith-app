@@ -7,11 +7,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Entity(name = "livraison_commande")
@@ -20,6 +22,7 @@ import java.util.Collection;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class LivraisonCommande {
     @Id
     private String numeroLivraison;
@@ -27,6 +30,8 @@ public class LivraisonCommande {
     private String adresse;
 
     private StatutLivraison statut;
+
+    private LocalDateTime dateCreation;
 
     @ManyToOne
     @JoinColumn(name = "num_commande", nullable = false)

@@ -1,5 +1,6 @@
 package com.reotra.demomonolith.commande.services;
 
+import com.reotra.demomonolith.commande.domain.Commande;
 import com.reotra.demomonolith.commande.dto.CreerCommandeRequest;
 import com.reotra.demomonolith.commande.dto.CreerCommandeResponse;
 import com.reotra.demomonolith.commande.dto.TrouverCommandeResponse;
@@ -12,4 +13,6 @@ public interface CommandeService {
     GenericResponse<CreerCommandeResponse> creerUneCommandeEnValidation(CreerCommandeRequest creerCommandeDTO);
     CreerCommandeResponse validerUneCommande(String commandeID);
     List<TrouverCommandeResponse> recupererListeDesCommandesPourUnProduit(String produitID);
+
+    Commande rechercherUneCommande(String numeroCommande);
 }

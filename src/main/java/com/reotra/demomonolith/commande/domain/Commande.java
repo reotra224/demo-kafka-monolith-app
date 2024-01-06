@@ -38,6 +38,8 @@ public class Commande {
 
     private LocalDateTime dateLivraison;
 
+    private String adresseLivraison;
+
     @OneToOne
     @JoinColumn(name = "produit_id", referencedColumnName = "id")
     private Produit produit;

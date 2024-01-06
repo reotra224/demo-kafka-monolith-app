@@ -1,6 +1,7 @@
 package com.reotra.demomonolith.commande.services.impl;
 
 import com.reotra.demomonolith.commande.domain.Commande;
+import com.reotra.demomonolith.commande.domain.EvolutionCommande;
 import com.reotra.demomonolith.commande.domain.Produit;
 import com.reotra.demomonolith.commande.domain.StatutCommande;
 import com.reotra.demomonolith.commande.dto.CreerCommandeRequest;
@@ -8,32 +9,34 @@ import com.reotra.demomonolith.commande.dto.CreerCommandeResponse;
 import com.reotra.demomonolith.commande.dto.StockProduitMisAJour;
 import com.reotra.demomonolith.commande.dto.TrouverCommandeResponse;
 import com.reotra.demomonolith.commande.repositories.CommandeRepository;
+import com.reotra.demomonolith.commande.repositories.EvolutionCommandeRepository;
 import com.reotra.demomonolith.commande.services.CommandeService;
+import com.reotra.demomonolith.common.services.UtilitairesService;
+import com.reotra.demomonolith.livraison.dto.LivraisonCommandeRequest;
+import com.reotra.demomonolith.livraison.services.LivraisonCommandeService;
 import com.reotra.demomonolith.commande.services.ProduitService;
 import com.reotra.demomonolith.commande.services.StockProduitService;
 import com.reotra.demomonolith.common.GenericResponse;
 import com.reotra.demomonolith.common.domain.CounterType;
-import com.reotra.demomonolith.common.services.UCounterService;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class CommandeServiceImpl implements CommandeService {
 
     private final CommandeRepository commandeRepository;
     private final ProduitService produitService;
     private final StockProduitService stockProduitService;
-    private final UCounterService counterService;
-
-    public CommandeServiceImpl(CommandeRepository commandeRepository, ProduitService produitService, StockProduitService stockProduitService, UCounterService counterService) {
-        this.commandeRepository = commandeRepository;
-        this.produitService = produitService;
-        this.stockProduitService = stockProduitService;
-        this.counterService = counterService;
-    }
+    private final UtilitairesService utilitairesService;
+    private final EvolutionCommandeRepository evolutionCommandeRepository;
+    private final LivraisonCommandeService livraisonCommandeService;
 
     @Override
     @Transactional
@@ -41,24 +44,38 @@ public class CommandeServiceImpl implements CommandeService {
 
         Produit produitTrouve = produitService.trouverUnProduitAvecSonID(creerCommandeDTO.produitID());
 
+        // Gestion du stock
         GenericResponse<StockProduitMisAJour> stockProduitMisAJour = stockProduitService.mettreAJourLeStockDuProduit(produitTrouve.getId(), creerCommandeDTO.quantite());
+        if (!stockProduitMisAJour.success()) {
+            return GenericResponse.error(stockProduitMisAJour.message());
+        }
 
-        return (!stockProduitMisAJour.success()) ? GenericResponse.error(stockProduitMisAJour.message()) : GenericResponse.success(CreerCommandeResponse.from(
-                commandeRepository.save(
-                        Commande.builder()
-                                .numCommande("CMDE-" + counterService.genererProchaineValeur(CounterType.COMMANDE.name()))
-                                .produit(produitTrouve)
-                                .quantite(creerCommandeDTO.quantite())
-                                .prixTotal(creerCommandeDTO.quantite()*produitTrouve.getPrix())
-                                .statut(StatutCommande.EN_ATTENTE_DE_VALIDATION)
-                                .dateCreation(LocalDateTime.now())
-                                .build()
-                ))
+        // Création de la nouvelle commande
+        Commande commandeCree = commandeRepository.save(Commande.builder()
+                .numCommande(utilitairesService.genererUnNouveauNumero(CounterType.COMMANDE))
+                .produit(produitTrouve)
+                .quantite(creerCommandeDTO.quantite())
+                .prixTotal(creerCommandeDTO.quantite() * produitTrouve.getPrix())
+                .statut(StatutCommande.EN_ATTENTE_DE_VALIDATION)
+                .dateCreation(LocalDateTime.now())
+                .adresseLivraison(creerCommandeDTO.adresse())
+                .build()
         );
+        evolutionCommandeRepository.save(EvolutionCommande.builder()
+                .commande(commandeCree)
+                .nouveauStatut(commandeCree.getStatut())
+                .dateChangement(LocalDateTime.now())
+                .build());
 
-        // Create evolution commande
-
-        // Call livraison service to create livraison and suivi
+        //Informer le service de livraison de la création d'une nouvelle commande
+        livraisonCommandeService.informerCreationNouvelleCommande(
+                LivraisonCommandeRequest.builder()
+                        .commande(commandeCree)
+                        .prix(produitTrouve.getPrix())
+                        .nomProduit(produitTrouve.getNom())
+                        .build()
+        );
+        return GenericResponse.success(CreerCommandeResponse.from(commandeCree));
     }
 
     @Override
@@ -69,5 +86,11 @@ public class CommandeServiceImpl implements CommandeService {
     @Override
     public List<TrouverCommandeResponse> recupererListeDesCommandesPourUnProduit(String produitID) {
         return null;
+    }
+
+    @Override
+    public Commande rechercherUneCommande(String numeroCommande) {
+        return commandeRepository.findById(numeroCommande)
+                .orElseThrow(() -> HttpClientErrorException.create("La commande numéro #" + numeroCommande + " n'existe pas", HttpStatus.NOT_FOUND, "Commande non trouvé", null, null, null));
     }
 }
