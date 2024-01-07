@@ -38,8 +38,8 @@ public class CommandeServiceImpl implements CommandeService {
     private final EvolutionCommandeRepository evolutionCommandeRepository;
     private final LivraisonCommandeService livraisonCommandeService;
 
-    @Override
     @Transactional
+    @Override
     public GenericResponse<CreerCommandeResponse> creerUneCommandeEnValidation(CreerCommandeRequest creerCommandeDTO) {
 
         Produit produitTrouve = produitService.trouverUnProduitAvecSonID(creerCommandeDTO.produitID());
@@ -66,21 +66,35 @@ public class CommandeServiceImpl implements CommandeService {
                 .nouveauStatut(commandeCree.getStatut())
                 .dateChangement(LocalDateTime.now())
                 .build());
+        return GenericResponse.success(CreerCommandeResponse.from(commandeCree));
+    }
+
+    @Transactional
+    @Override
+    public GenericResponse<CreerCommandeResponse> validerUneCommande(String commandeID) {
+
+        // Mettre à jour la commande
+        Commande commande = rechercherUneCommande(commandeID);
+        commande.setStatut(StatutCommande.VALIDE);
+        commande = commandeRepository.save(commande);
+
+        // Mettre à jour l'évolution de la commande
+        evolutionCommandeRepository.save(EvolutionCommande.builder()
+                .commande(commande)
+                .nouveauStatut(commande.getStatut())
+                .dateChangement(LocalDateTime.now())
+                .build()
+        );
 
         //Informer le service de livraison de la création d'une nouvelle commande
         livraisonCommandeService.informerCreationNouvelleCommande(
                 LivraisonCommandeRequest.builder()
-                        .commande(commandeCree)
-                        .prix(produitTrouve.getPrix())
-                        .nomProduit(produitTrouve.getNom())
+                        .commande(commande)
+                        .prix(commande.getProduit().getPrix())
+                        .nomProduit(commande.getProduit().getNom())
                         .build()
         );
-        return GenericResponse.success(CreerCommandeResponse.from(commandeCree));
-    }
-
-    @Override
-    public CreerCommandeResponse validerUneCommande(String commandeID) {
-        return null;
+        return GenericResponse.success(CreerCommandeResponse.from(commande));
     }
 
     @Override

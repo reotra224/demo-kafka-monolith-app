@@ -11,7 +11,7 @@ import java.util.List;
 public interface CommandeService {
 
     GenericResponse<CreerCommandeResponse> creerUneCommandeEnValidation(CreerCommandeRequest creerCommandeDTO);
-    CreerCommandeResponse validerUneCommande(String commandeID);
+    GenericResponse<CreerCommandeResponse> validerUneCommande(String commandeID);
     List<TrouverCommandeResponse> recupererListeDesCommandesPourUnProduit(String produitID);
 
     Commande rechercherUneCommande(String numeroCommande);
