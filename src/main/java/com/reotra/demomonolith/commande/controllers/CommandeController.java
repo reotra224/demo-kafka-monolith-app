@@ -5,7 +5,9 @@ import com.reotra.demomonolith.commande.dto.CreerCommandeResponse;
 import com.reotra.demomonolith.commande.services.CommandeService;
 import com.reotra.demomonolith.common.dto.GenericResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +25,11 @@ public class CommandeController {
     @PostMapping(value = "/creer")
     public ResponseEntity<GenericResponse<CreerCommandeResponse>> creerUneCommande(@RequestBody CreerCommandeRequest commandeRequest) {
         return ResponseEntity.ok(commandeService.creerUneCommandeEnValidation(commandeRequest));
+    }
+
+    @PutMapping(value = "/valider/{numCommande}")
+    public ResponseEntity<GenericResponse<CreerCommandeResponse>> validerUneCommande(@PathVariable(value = "numCommande") String numeroCommande) {
+        return ResponseEntity.ok(commandeService.validerUneCommande(numeroCommande));
     }
 
 }
