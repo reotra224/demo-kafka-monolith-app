@@ -57,8 +57,4 @@ public class StockProduitServiceImpl implements StockProduitService {
                 .orElseThrow(() -> HttpClientErrorException.create("Le produit avec ID #" + uuid + " n'a pas de stock", HttpStatus.NOT_FOUND, "Stock Produit non trouvé", null, null, null));
     }
 
-    @Override
-    public boolean verifierLeStockPourUnProduit(UUID uuid, Integer quantite) {
-        return recupererLeStockPourUnProduit(uuid).getStockActuel() >= quantite;
-    }
 }

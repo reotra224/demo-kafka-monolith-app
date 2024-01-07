@@ -11,5 +11,4 @@ public interface StockProduitService {
     GenericResponse<StockProduitMisAJour> mettreAJourLeStockDuProduit(UUID produitId, Integer quantite);
 
     StockProduit recupererLeStockPourUnProduit(UUID uuid);
-    boolean verifierLeStockPourUnProduit(UUID uuid, Integer quantite);
 }

@@ -1,7 +1,6 @@
 package com.reotra.demomonolith.common.services;
 
 import com.reotra.demomonolith.common.domain.CounterType;
-import com.reotra.demomonolith.common.services.UCounterService;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -99,11 +99,6 @@ public class CommandeServiceImpl implements CommandeService {
     }
 
     @Override
-    public List<TrouverCommandeResponse> recupererListeDesCommandesPourUnProduit(String produitID) {
-        return null;
-    }
-
-    @Override
     public Commande rechercherUneCommande(String numeroCommande) {
         return commandeRepository.findById(numeroCommande)
                 .orElseThrow(() -> HttpClientErrorException.create("La commande numéro #" + numeroCommande + " n'existe pas", HttpStatus.NOT_FOUND, "Commande non trouvé", null, null, null));
