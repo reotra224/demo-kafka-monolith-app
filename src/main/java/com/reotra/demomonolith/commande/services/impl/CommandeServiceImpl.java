@@ -8,7 +8,6 @@ import com.reotra.demomonolith.commande.dto.CreerCommandeRequest;
 import com.reotra.demomonolith.commande.dto.CreerCommandeResponse;
 import com.reotra.demomonolith.livraison.dto.LivraisonCommandeReponse;
 import com.reotra.demomonolith.stock.dto.StockProduitMisAJour;
-import com.reotra.demomonolith.commande.dto.TrouverCommandeResponse;
 import com.reotra.demomonolith.commande.repositories.CommandeRepository;
 import com.reotra.demomonolith.commande.repositories.EvolutionCommandeRepository;
 import com.reotra.demomonolith.commande.services.CommandeService;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @AllArgsConstructor

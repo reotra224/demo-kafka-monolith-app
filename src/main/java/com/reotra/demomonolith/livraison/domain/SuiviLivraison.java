@@ -2,6 +2,8 @@ package com.reotra.demomonolith.livraison.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,8 +33,10 @@ public class SuiviLivraison {
     @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
     private StatutLivraison ancienStatut;
 
+    @Enumerated(EnumType.STRING)
     private StatutLivraison nouveauStatut;
 
     private LocalDateTime dateChangement;

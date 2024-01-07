@@ -2,6 +2,8 @@ package com.reotra.demomonolith.livraison.domain;
 
 import com.reotra.demomonolith.commande.domain.Commande;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -29,6 +31,7 @@ public class LivraisonCommande {
 
     private String adresse;
 
+    @Enumerated(EnumType.STRING)
     private StatutLivraison statut;
 
     private LocalDateTime dateCreation;

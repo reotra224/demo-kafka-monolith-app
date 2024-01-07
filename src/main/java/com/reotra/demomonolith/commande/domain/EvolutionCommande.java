@@ -2,6 +2,8 @@ package com.reotra.demomonolith.commande.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,8 +32,10 @@ public class EvolutionCommande {
     @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
     private StatutCommande ancienStatut;
 
+    @Enumerated(EnumType.STRING)
     private StatutCommande nouveauStatut;
 
     private LocalDateTime dateChangement;

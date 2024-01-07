@@ -2,6 +2,8 @@ package com.reotra.demomonolith.commande.domain;
 
 import com.reotra.demomonolith.livraison.domain.LivraisonCommande;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -32,6 +34,7 @@ public class Commande {
 
     private Integer quantite;
 
+    @Enumerated(EnumType.STRING)
     private StatutCommande statut;
 
     private LocalDateTime dateCreation;
