@@ -3,7 +3,7 @@ package com.reotra.demomonolith.commande.controllers;
 import com.reotra.demomonolith.commande.dto.CreerCommandeRequest;
 import com.reotra.demomonolith.commande.dto.CreerCommandeResponse;
 import com.reotra.demomonolith.commande.services.CommandeService;
-import com.reotra.demomonolith.common.GenericResponse;
+import com.reotra.demomonolith.common.dto.GenericResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

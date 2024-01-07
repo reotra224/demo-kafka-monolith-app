@@ -1,6 +1,6 @@
 package com.reotra.demomonolith.livraison.services.impl;
 
-import com.reotra.demomonolith.common.GenericResponse;
+import com.reotra.demomonolith.common.dto.GenericResponse;
 import com.reotra.demomonolith.common.services.UtilitairesService;
 import com.reotra.demomonolith.common.domain.CounterType;
 import com.reotra.demomonolith.livraison.domain.LivraisonCommande;

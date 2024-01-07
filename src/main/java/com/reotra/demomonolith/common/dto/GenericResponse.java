@@ -1,4 +1,4 @@
-package com.reotra.demomonolith.common;
+package com.reotra.demomonolith.common.dto;
 
 import lombok.Builder;
 

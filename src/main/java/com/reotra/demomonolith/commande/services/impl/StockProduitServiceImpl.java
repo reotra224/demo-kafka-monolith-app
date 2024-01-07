@@ -2,7 +2,7 @@ package com.reotra.demomonolith.commande.services.impl;
 
 import com.reotra.demomonolith.commande.dto.StockProduitMisAJour;
 import com.reotra.demomonolith.commande.services.StockProduitService;
-import com.reotra.demomonolith.common.GenericResponse;
+import com.reotra.demomonolith.common.dto.GenericResponse;
 import com.reotra.demomonolith.stock.domain.MouvementStock;
 import com.reotra.demomonolith.stock.domain.StockProduit;
 import com.reotra.demomonolith.stock.repositories.MouvementStockRepository;

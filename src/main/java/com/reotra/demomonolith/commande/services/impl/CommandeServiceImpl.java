@@ -16,7 +16,7 @@ import com.reotra.demomonolith.livraison.dto.LivraisonCommandeRequest;
 import com.reotra.demomonolith.livraison.services.LivraisonCommandeService;
 import com.reotra.demomonolith.commande.services.ProduitService;
 import com.reotra.demomonolith.commande.services.StockProduitService;
-import com.reotra.demomonolith.common.GenericResponse;
+import com.reotra.demomonolith.common.dto.GenericResponse;
 import com.reotra.demomonolith.common.domain.CounterType;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;

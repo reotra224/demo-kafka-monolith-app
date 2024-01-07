@@ -4,7 +4,7 @@ import com.reotra.demomonolith.commande.domain.Commande;
 import com.reotra.demomonolith.commande.dto.CreerCommandeRequest;
 import com.reotra.demomonolith.commande.dto.CreerCommandeResponse;
 import com.reotra.demomonolith.commande.dto.TrouverCommandeResponse;
-import com.reotra.demomonolith.common.GenericResponse;
+import com.reotra.demomonolith.common.dto.GenericResponse;
 
 import java.util.List;
 

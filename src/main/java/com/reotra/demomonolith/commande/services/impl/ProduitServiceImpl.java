@@ -3,11 +3,7 @@ package com.reotra.demomonolith.commande.services.impl;
 import com.reotra.demomonolith.commande.domain.Produit;
 import com.reotra.demomonolith.commande.repositories.ProduitRepository;
 import com.reotra.demomonolith.commande.services.ProduitService;
-import com.reotra.demomonolith.common.GenericResponse;
-import com.reotra.demomonolith.stock.domain.StockProduit;
-import com.reotra.demomonolith.stock.repositories.StockProduitRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 

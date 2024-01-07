@@ -1,7 +1,7 @@
 package com.reotra.demomonolith.commande.services;
 
 import com.reotra.demomonolith.commande.dto.StockProduitMisAJour;
-import com.reotra.demomonolith.common.GenericResponse;
+import com.reotra.demomonolith.common.dto.GenericResponse;
 import com.reotra.demomonolith.stock.domain.StockProduit;
 
 import java.util.UUID;
