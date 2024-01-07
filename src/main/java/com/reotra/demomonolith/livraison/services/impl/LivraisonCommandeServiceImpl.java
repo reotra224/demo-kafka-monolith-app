@@ -1,5 +1,6 @@
 package com.reotra.demomonolith.livraison.services.impl;
 
+import com.reotra.demomonolith.commande.services.CommandeService;
 import com.reotra.demomonolith.common.dto.GenericResponse;
 import com.reotra.demomonolith.common.services.UtilitairesService;
 import com.reotra.demomonolith.common.domain.CounterType;
@@ -13,7 +14,7 @@ import com.reotra.demomonolith.livraison.repositories.LivraisonCommandeRepositor
 import com.reotra.demomonolith.livraison.repositories.SuiviLivraisonRepository;
 import com.reotra.demomonolith.livraison.services.LivraisonCommandeService;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -21,12 +22,20 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.time.LocalDateTime;
 
 @Service
-@AllArgsConstructor
 public class LivraisonCommandeServiceImpl implements LivraisonCommandeService {
 
     private final LivraisonCommandeRepository repository;
     private final SuiviLivraisonRepository suiviLivraisonRepository;
     private final UtilitairesService utilitairesService;
+    private final CommandeService commandeService;
+
+    public LivraisonCommandeServiceImpl(LivraisonCommandeRepository repository, SuiviLivraisonRepository suiviLivraisonRepository, UtilitairesService utilitairesService, @Lazy CommandeService commandeService) {
+        this.repository = repository;
+        this.suiviLivraisonRepository = suiviLivraisonRepository;
+        this.utilitairesService = utilitairesService;
+        this.commandeService = commandeService;
+    }
+
 
     @Override
     @Transactional
@@ -70,12 +79,20 @@ public class LivraisonCommandeServiceImpl implements LivraisonCommandeService {
                 .dateChangement(LocalDateTime.now())
                 .build());
 
-        return GenericResponse.success(LivraisonCommandeReponse.builder()
+
+        LivraisonCommandeReponse livraisonEtat = LivraisonCommandeReponse.builder()
                 .numeroCommande(livraison.getCommande().getNumCommande())
                 .numeroLivraison(livraison.getNumeroLivraison())
                 .statut(livraison.getStatut())
                 .adresseLivraison(livraison.getAdresse())
-                .build());
+                .build();
+
+        // Informer le service de commande, quand la commande sera livré
+        if (StatutLivraison.COMPLETE.equals(livraison.getStatut())) {
+            commandeService.informerQueLaCommandeAeteLivre(livraisonEtat);
+        }
+
+        return GenericResponse.success(livraisonEtat);
     }
 
     @Override

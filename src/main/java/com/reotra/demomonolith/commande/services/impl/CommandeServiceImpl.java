@@ -6,6 +6,7 @@ import com.reotra.demomonolith.commande.domain.Produit;
 import com.reotra.demomonolith.commande.domain.StatutCommande;
 import com.reotra.demomonolith.commande.dto.CreerCommandeRequest;
 import com.reotra.demomonolith.commande.dto.CreerCommandeResponse;
+import com.reotra.demomonolith.livraison.dto.LivraisonCommandeReponse;
 import com.reotra.demomonolith.stock.dto.StockProduitMisAJour;
 import com.reotra.demomonolith.commande.dto.TrouverCommandeResponse;
 import com.reotra.demomonolith.commande.repositories.CommandeRepository;
@@ -106,5 +107,24 @@ public class CommandeServiceImpl implements CommandeService {
     public Commande rechercherUneCommande(String numeroCommande) {
         return commandeRepository.findById(numeroCommande)
                 .orElseThrow(() -> HttpClientErrorException.create("La commande numéro #" + numeroCommande + " n'existe pas", HttpStatus.NOT_FOUND, "Commande non trouvé", null, null, null));
+    }
+
+    @Override
+    public void informerQueLaCommandeAeteLivre(LivraisonCommandeReponse livraisonEtat) {
+
+        // Mettre à jour la commande
+        Commande commande = rechercherUneCommande(livraisonEtat.numeroCommande());
+        commande.setStatut(StatutCommande.COMPLETE);
+        commande = commandeRepository.save(commande);
+
+        // Mettre à jour l'évolution de la commande
+        evolutionCommandeRepository.save(EvolutionCommande.builder()
+                .commande(commande)
+                .nouveauStatut(commande.getStatut())
+                .dateChangement(LocalDateTime.now())
+                .build()
+        );
+
+        //On pourrait à ce niveau, notifier le client ou un autre service si nécessaire de la livraison de la commande
     }
 }
