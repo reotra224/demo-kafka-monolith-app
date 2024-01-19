@@ -2,15 +2,19 @@ package com.reotra.demomonolith.commande.controllers;
 
 import com.reotra.demomonolith.commande.dto.CreerCommandeRequest;
 import com.reotra.demomonolith.commande.dto.CreerCommandeResponse;
+import com.reotra.demomonolith.commande.dto.GetCommandeListResponse;
 import com.reotra.demomonolith.commande.services.CommandeService;
 import com.reotra.demomonolith.common.dto.GenericResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/commande")
@@ -30,6 +34,11 @@ public class CommandeController {
     @PutMapping(value = "/valider/{numCommande}")
     public ResponseEntity<GenericResponse<CreerCommandeResponse>> validerUneCommande(@PathVariable(value = "numCommande") String numeroCommande) {
         return ResponseEntity.ok(commandeService.validerUneCommande(numeroCommande));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<GetCommandeListResponse>> getAllCommandes() {
+        return ResponseEntity.ok(commandeService.recupererTouteLesCommandes());
     }
 
 }

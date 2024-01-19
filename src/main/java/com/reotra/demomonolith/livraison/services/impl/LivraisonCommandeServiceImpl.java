@@ -1,9 +1,9 @@
 package com.reotra.demomonolith.livraison.services.impl;
 
 import com.reotra.demomonolith.commande.services.CommandeService;
+import com.reotra.demomonolith.common.domain.CounterType;
 import com.reotra.demomonolith.common.dto.GenericResponse;
 import com.reotra.demomonolith.common.services.UtilitairesService;
-import com.reotra.demomonolith.common.domain.CounterType;
 import com.reotra.demomonolith.livraison.domain.LivraisonCommande;
 import com.reotra.demomonolith.livraison.domain.StatutLivraison;
 import com.reotra.demomonolith.livraison.domain.SuiviLivraison;
@@ -25,14 +25,14 @@ import java.time.LocalDateTime;
 public class LivraisonCommandeServiceImpl implements LivraisonCommandeService {
 
     private final LivraisonCommandeRepository repository;
-    private final SuiviLivraisonRepository suiviLivraisonRepository;
     private final UtilitairesService utilitairesService;
+    private final SuiviLivraisonRepository suiviLivraisonRepository;
     private final CommandeService commandeService;
 
-    public LivraisonCommandeServiceImpl(LivraisonCommandeRepository repository, SuiviLivraisonRepository suiviLivraisonRepository, UtilitairesService utilitairesService, @Lazy CommandeService commandeService) {
+    public LivraisonCommandeServiceImpl(LivraisonCommandeRepository repository, UtilitairesService utilitairesService, SuiviLivraisonRepository suiviLivraisonRepository, @Lazy CommandeService commandeService) {
         this.repository = repository;
-        this.suiviLivraisonRepository = suiviLivraisonRepository;
         this.utilitairesService = utilitairesService;
+        this.suiviLivraisonRepository = suiviLivraisonRepository;
         this.commandeService = commandeService;
     }
 
@@ -41,25 +41,31 @@ public class LivraisonCommandeServiceImpl implements LivraisonCommandeService {
     @Transactional
     public GenericResponse<LivraisonCommandeReponse> informerCreationNouvelleCommande(LivraisonCommandeRequest livraisonCommandeRequest) {
 
-        LivraisonCommande livraisonCommande = repository.save(LivraisonCommande.builder()
-                .numeroLivraison(utilitairesService.genererUnNouveauNumero(CounterType.LIVRAISON))
-                .statut(StatutLivraison.EN_VALIDATION)
-                .commande(livraisonCommandeRequest.commande())
-                .adresse(livraisonCommandeRequest.commande().getAdresseLivraison())
-                .dateCreation(LocalDateTime.now())
-                .build());
+        // Créer une nouvelle livraison
+        LivraisonCommande nouvelleLivraison = repository.save(
+                LivraisonCommande.builder()
+                        .numeroLivraison(utilitairesService.genererUnNouveauNumero(CounterType.LIVRAISON))
+                        .statut(StatutLivraison.EN_VALIDATION)
+                        .commande(livraisonCommandeRequest.commande())
+                        .adresse(livraisonCommandeRequest.commande().getAdresseLivraison())
+                        .dateCreation(LocalDateTime.now())
+                        .build()
+        );
 
+
+        // Mettre à jour l'historique de suivi d'une livraison
         suiviLivraisonRepository.save(SuiviLivraison.builder()
-                .livraison(livraisonCommande)
-                .nouveauStatut(livraisonCommande.getStatut())
+                .livraison(nouvelleLivraison)
+                .nouveauStatut(nouvelleLivraison.getStatut())
                 .dateChangement(LocalDateTime.now())
-                .build());
+                .build()
+        );
 
         return GenericResponse.success(LivraisonCommandeReponse.builder()
                 .numeroCommande(livraisonCommandeRequest.commande().getNumCommande())
-                .numeroLivraison(livraisonCommande.getNumeroLivraison())
-                .statut(livraisonCommande.getStatut())
-                .adresseLivraison(livraisonCommande.getAdresse())
+                .numeroLivraison(nouvelleLivraison.getNumeroLivraison())
+                .statut(nouvelleLivraison.getStatut())
+                .adresseLivraison(nouvelleLivraison.getAdresse())
                 .build());
     }
 
@@ -68,31 +74,34 @@ public class LivraisonCommandeServiceImpl implements LivraisonCommandeService {
     public GenericResponse<LivraisonCommandeReponse> mettreAJourLetatDeLaLivraison(ChangerEtatRequest changerEtatRequest) {
 
         // Mettre à jour la livraison
-        LivraisonCommande livraison = retrouverUneLivraison(changerEtatRequest.numeroLivraison());
-        livraison.setStatut(changerEtatRequest.statut());
-        livraison = repository.save(livraison);
+        LivraisonCommande livraisonCommande = retrouverUneLivraison(changerEtatRequest.numeroLivraison());
+        StatutLivraison ancienStatut = livraisonCommande.getStatut();
+
+        livraisonCommande.setStatut(changerEtatRequest.statut());
+        repository.save(livraisonCommande);
 
         // Mettre à jour l'historique
         suiviLivraisonRepository.save(SuiviLivraison.builder()
-                .livraison(livraison)
-                .nouveauStatut(livraison.getStatut())
+                .livraison(livraisonCommande)
+                .ancienStatut(ancienStatut)
+                .nouveauStatut(livraisonCommande.getStatut())
                 .dateChangement(LocalDateTime.now())
-                .build());
+                .build()
+        );
 
-
-        LivraisonCommandeReponse livraisonEtat = LivraisonCommandeReponse.builder()
-                .numeroCommande(livraison.getCommande().getNumCommande())
-                .numeroLivraison(livraison.getNumeroLivraison())
-                .statut(livraison.getStatut())
-                .adresseLivraison(livraison.getAdresse())
+        LivraisonCommandeReponse livraisonReponse = LivraisonCommandeReponse.builder()
+                .numeroCommande(livraisonCommande.getCommande().getNumCommande())
+                .numeroLivraison(livraisonCommande.getNumeroLivraison())
+                .statut(livraisonCommande.getStatut())
+                .adresseLivraison(livraisonCommande.getAdresse())
                 .build();
 
-        // Informer le service de commande, quand la commande sera livré
-        if (StatutLivraison.COMPLETE.equals(livraison.getStatut())) {
-            commandeService.informerQueLaCommandeAeteLivre(livraisonEtat);
+        // Informer le service de commande de l'état de la livraison
+        if (StatutLivraison.COMPLETE.equals(livraisonReponse.statut())) {
+            commandeService.informerQueLaCommandeAeteLivre(livraisonReponse);
         }
 
-        return GenericResponse.success(livraisonEtat);
+        return GenericResponse.success(livraisonReponse);
     }
 
     @Override
